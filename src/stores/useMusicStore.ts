@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { Album, Song } from "@/types";
+import { Album, Song, Stats } from "@/types";
 import { create } from "zustand";
 
 interface MusicStore {
@@ -11,12 +11,15 @@ interface MusicStore {
   featuredSongs: Song[];
   madeForYouSongs: Song[];
   trendingSongs: Song[];
+  stats: Stats;
 
   fetchAlbums: () => Promise<void>;
   fetchAlbumById: (albumId: string) => Promise<void>;
   fetchFeaturedSongs: () => Promise<void>;
   fetchMadeForYouSongs: () => Promise<void>;
   fetchTrendingSongs: () => Promise<void>;
+  fetchStats: () => Promise<void>;
+  fetchSongs: () => Promise<void>;
 }
 
 export const useMusicStore = create<MusicStore>((set) => ({
@@ -28,6 +31,12 @@ export const useMusicStore = create<MusicStore>((set) => ({
   featuredSongs: [],
   madeForYouSongs: [],
   trendingSongs: [],
+  stats: {
+    totalSongs: 0,
+    totalAlbums: 0,
+    totalArtists: 0,
+    totalUsers: 0,
+  },
 
   fetchAlbums: async () => {
     try {
@@ -97,6 +106,36 @@ export const useMusicStore = create<MusicStore>((set) => ({
         throw new Error("Failed to fetch trending songs");
       }
       set({ trendingSongs: response.data });
+    } catch (error: any) {
+      set({ error: error.response.data.message });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchSongs: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await axiosInstance.get("/songs");
+      if (!response) {
+        throw new Error("Failed to fetch songs");
+      }
+      set({ songs: response.data });
+    } catch (error: any) {
+      set({ error: error.response.data.message });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchStats: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await axiosInstance.get("/stats");
+      if (!response) {
+        throw new Error("Failed to fetch stats");
+      }
+      set({ stats: response.data });
     } catch (error: any) {
       set({ error: error.response.data.message });
     } finally {
