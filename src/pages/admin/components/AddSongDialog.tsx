@@ -193,11 +193,24 @@ const AddSongDialog = () => {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setSongDialogOpen(false)} disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSongDialogOpen(false);
+              setNewSong({
+                title: "",
+                artist: "",
+                album: "",
+                duration: 0,
+              });
+              setFile({ audio: null, image: null });
+            }}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
 
-          <Button onClick={handleSubmit} disabled={isLoading}>
+          <Button onClick={handleSubmit} disabled={isLoading} className="text-white">
             {isLoading ? "Uploading..." : "Upload"}
           </Button>
         </DialogFooter>
